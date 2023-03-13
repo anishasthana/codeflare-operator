@@ -232,5 +232,12 @@ catalog-push: ## Push a catalog image.
 	$(MAKE) image-push IMG=$(CATALOG_IMG)
 
 .PHONY: test-unit
-test-unit: manifests generate fmt vet envtest ## Run tests.
+test-unit: manifests generate fmt vet envtest ## Run Unit tests.
+	KUBEBUILDER_ASSETS="$(shell $(ENVTEST) use $(ENVTEST_K8S_VERSION) --bin-dir $(LOCALBIN) -p path)" go test -race github.com/project-codeflare/codeflare-operator/controllers -coverprofile cover.out
+
+.PHONY: test-e2e
+test-e2e: manifests generate fmt vet envtest ## Run e2e tests.
 	KUBEBUILDER_ASSETS="$(shell $(ENVTEST) use $(ENVTEST_K8S_VERSION) --bin-dir $(LOCALBIN) -p path)" go test ./... -coverprofile cover.out
+
+.PHONY: test-all
+test-all: test-unit test-e2e
